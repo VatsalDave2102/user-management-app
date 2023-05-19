@@ -1,5 +1,5 @@
 import { ErrorMessage, Field, Formik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Container, Form, Image } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -57,7 +57,14 @@ const FormComp = () => {
   console.log(userList);
   const [previewImage, setPreviewImage] = useState(null);
   const navigate = useNavigate();
+  const loggedInUser = useSelector(state=> state.auth.loggedInUser)
 
+  useEffect(()=>{
+    if(!Object.keys(loggedInUser).length == 0){
+        navigate('/home')
+    }
+  })
+  
   const handleSubmit = (values, { setSubmitting }) => {
     dispatch(
       authAction.signup({
@@ -95,7 +102,7 @@ const FormComp = () => {
     setPreviewImage("");
     resetForm();
   };
-  
+
   return (
     <Container fluid="md">
       <h1 className="mb-3">Sign up</h1>

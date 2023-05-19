@@ -6,6 +6,7 @@ import Root from "./pages/Root";
 import Error from "./pages/Error";
 import Welcome from "./components/welcome/Welcome";
 import Login from "./pages/Login";
+import ProtectedRoutes from "./components/protected-routes/ProtectedRoutes";
 
 const router = createBrowserRouter([
   {
@@ -14,7 +15,13 @@ const router = createBrowserRouter([
     errorElement: <Error />,
     children: [
       { path: "", element: <Welcome /> },
-      { path: "home", element: <Home /> },
+      {
+        path: "home",
+        element: (
+          <ProtectedRoutes Element= {Home}/>
+            
+        ),
+      },
       { path: "login", element: <Login /> },
       { path: "signup", element: <Signup />, index: true },
     ],

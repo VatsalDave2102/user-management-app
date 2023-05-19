@@ -1,5 +1,5 @@
 import { ErrorMessage, Field, Formik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Container, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -24,7 +24,14 @@ const LoginForm = () => {
   console.log(userList);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const loggedInUser = useSelector(state=> state.auth.loggedInUser)
 
+  useEffect(()=>{
+    if(!Object.keys(loggedInUser).length == 0){
+        navigate('/home')
+    }
+  })
+  
   const checkUserPresence = (values) => {
     console.log(values);
     let userPresence = userList.find(
