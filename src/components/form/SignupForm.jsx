@@ -1,8 +1,10 @@
 import { ErrorMessage, Field, Formik } from "formik";
 import { useState } from "react";
 import { Button, Container, Form, Image } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
+import { authAction } from "../../store/authSlice";
 
 const initialValues = {
   name: "",
@@ -14,7 +16,6 @@ const initialValues = {
 };
 
 const MAX_SIZE = 2 * 1024 * 1024;
-const SUPPORTED_FORMATS = ["image/png", "image/jpg", "image/jpeg"];
 
 const validationSchema = Yup.object({
   // name validation
@@ -47,21 +48,29 @@ const validationSchema = Yup.object({
       "fileSize",
       "Image size should be less than 2mb",
       (value) => value && value.size <= MAX_SIZE
-    )
-    .test("fileType", "Unsupported File Format", (value) =>
-      SUPPORTED_FORMATS.includes(value.type)
     ),
 });
 
 const FormComp = () => {
+  const dispatch = useDispatch();
+  const userList = useSelector((state) => state.auth.userList);
+  console.log(userList);
   const [previewImage, setPreviewImage] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = (values, { setSubmitting }) => {
-    console.log(values);
+    dispatch(
+      authAction.signup({
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        password: values.password,
+        image: previewImage,
+      })
+    );
     setTimeout(() => {
       setSubmitting(false);
-      navigate("/home");
+      navigate("/login");
     }, 1000);
   };
 
@@ -86,6 +95,7 @@ const FormComp = () => {
     setPreviewImage("");
     resetForm();
   };
+  
   return (
     <Container fluid="md">
       <h1 className="mb-3">Sign up</h1>
@@ -113,6 +123,7 @@ const FormComp = () => {
                 onChange={(e) => handleImageChange(e, setFieldValue)}
                 as={Form.Control}
                 className="d-none"
+                accept="image/png, image/jpg, image/jpeg"
               />
               <div className="preview-container col-sm-12 col-lg-3 col-md-6 ">
                 {previewImage && (
@@ -224,6 +235,9 @@ const FormComp = () => {
                 Reset
               </Button>
             </div>
+            <p className="mt-1">
+              Already a User? <Link to={"/login"}>Login here</Link>
+            </p>
           </Form>
         )}
       </Formik>
