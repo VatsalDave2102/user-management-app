@@ -11,7 +11,6 @@ const authSlice = createSlice({
       state.userList.push(action.payload);
     },
     setLoggedInUser(state, action) {
-      console.log(action.payload);
       state.loggedInUser = action.payload;
     },
   },

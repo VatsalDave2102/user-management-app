@@ -4,7 +4,7 @@ import { Container, Image } from "react-bootstrap";
 
 const Signup = () => {
   return (
-    <Container className="shadow rounder d-flex flex-md-row flex-column mt-md-5 p-3">
+    <Container className="shadow rounder d-flex flex-md-row flex-column mt-md-5 p-3 signup-form-container">
       <SignupForm />
       <Container className="img-container d-flex align-items-center mt-5 mt-md-0 p-5">
         <Image src={SIGNUPIMG} fluid />

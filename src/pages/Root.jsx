@@ -1,13 +1,13 @@
-import { Outlet } from "react-router-dom"
-import NavbarComp from "../components/navbar/NavbarComp"
+import { Outlet } from "react-router-dom";
+import NavbarComp from "../components/navbar/NavbarComp";
 
 const Root = () => {
   return (
     <>
-    <NavbarComp/>
-    <Outlet/>
+      <NavbarComp />
+      <Outlet />
     </>
-  )
-}
+  );
+};
 
-export default Root
+export default Root;

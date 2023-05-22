@@ -1,10 +1,12 @@
-import { ErrorMessage, Field, Formik } from "formik";
+import { Formik } from "formik";
 import { useEffect, useState } from "react";
-import { Button, Container, Form, Image } from "react-bootstrap";
+import { Button, Container, Form } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { authAction } from "../../store/authSlice";
+import ImageField from "../input-fields/ImageField";
+import InputField from "../input-fields/InputField";
 
 const initialValues = {
   name: "",
@@ -53,51 +55,68 @@ const validationSchema = Yup.object({
 
 const FormComp = () => {
   const dispatch = useDispatch();
-  const userList = useSelector((state) => state.auth.userList);
-  console.log(userList);
   const [previewImage, setPreviewImage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const loggedInUser = useSelector(state=> state.auth.loggedInUser)
+  const loggedInUser = useSelector((state) => state.auth.loggedInUser);
+  const userList = useSelector((state) => state.auth.userList);
 
-  useEffect(()=>{
-    if(!Object.keys(loggedInUser).length == 0){
-        navigate('/home')
+  // to navigate user to home if he's already logged in
+  useEffect(() => {
+    if (!Object.keys(loggedInUser).length == 0) {
+      navigate("/home");
     }
-  })
-  
-  const handleSubmit = (values, { setSubmitting }) => {
-    dispatch(
-      authAction.signup({
-        name: values.name,
-        email: values.email,
-        phone: values.phone,
-        password: values.password,
-        image: previewImage,
-      })
-    );
-    setTimeout(() => {
-      setSubmitting(false);
-      navigate("/login");
-    }, 1000);
+  });
+
+  // to check if email is already used for any other account
+  const checkUserExist = (values) => {
+    let userExist = userList.find((user) => user.email == values.email);
+    if (userExist !== undefined) {
+      return userExist;
+    } else {
+      return false;
+    }
   };
 
+  const handleSubmit = (values, { setSubmitting }) => {
+    if (!checkUserExist(values)) {
+      // saving new user data by dispatching
+      dispatch(
+        authAction.signup({
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          password: values.password,
+          image: previewImage,
+        })
+      );
+      setTimeout(() => {
+        setSubmitting(false);
+        navigate("/login");
+      }, 1000);
+    } else {
+      setErrorMessage("User already exists, try logging in.");
+      setSubmitting(false);
+    }
+  };
+
+  // function to handle image input changes
   const handleImageChange = (event, setFieldValue) => {
     setPreviewImage(null);
     event.preventDefault();
     let reader = new FileReader();
     const file = event.target.files[0];
-
     setFieldValue("image", file);
 
     if (file) {
       reader.onloadend = () => {
-        console.log(file);
         setPreviewImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
+  // to reset form
   const handleReset = (resetForm) => {
     setPreviewImage("");
     resetForm();
@@ -121,117 +140,33 @@ const FormComp = () => {
         }) => (
           <Form onSubmit={handleSubmit}>
             {/* Image field */}
-            <Form.Group controlId="image" className="py-1 text-center">
-              <Form.Label className="text-center">Photo +</Form.Label>
-              <Field
-                type="file"
-                name="image"
-                value={undefined}
-                onChange={(e) => handleImageChange(e, setFieldValue)}
-                as={Form.Control}
-                className="d-none"
-                accept="image/png, image/jpg, image/jpeg"
-              />
-              <div className="preview-container col-sm-12 col-lg-3 col-md-6 ">
-                {previewImage && (
-                  <Image
-                    src={previewImage}
-                    alt="Preview"
-                    thumbnail
-                    className="mt-2"
-                  />
-                )}
-              </div>
-
-              <ErrorMessage
-                name="image"
-                component="div"
-                className="text-danger"
-              />
-            </Form.Group>
+            <ImageField
+              handleImageChange={handleImageChange}
+              setFieldValue={setFieldValue}
+              previewImage={previewImage}
+            />
 
             {/* Name field */}
-            <Form.Group controlId="name" className="py-1">
-              <Form.Label>Name</Form.Label>
-              <Field
-                type="text"
-                name="name"
-                as={Form.Control}
-                style={{ backgroundColor: "#faebd8 " }}
-              />
-              <ErrorMessage
-                name="name"
-                component="div"
-                className="text-danger"
-              />
-            </Form.Group>
+            <InputField field="name" />
 
             {/* Email field */}
-            <Form.Group controlId="email" className="py-1">
-              <Form.Label>Email</Form.Label>
-              <Field
-                type="email"
-                name="email"
-                as={Form.Control}
-                style={{ backgroundColor: "#faebd8 " }}
-              />
-              <ErrorMessage
-                name="email"
-                component="div"
-                className="text-danger"
-              />
-            </Form.Group>
+            <InputField field="email" />
 
             {/* Phone field */}
-            <Form.Group controlId="phone" className="py-1">
-              <Form.Label>PhoneNo</Form.Label>
-              <Field
-                type="text"
-                name="phone"
-                as={Form.Control}
-                style={{ backgroundColor: "#faebd8 " }}
-              />
-              <ErrorMessage
-                name="phone"
-                component="div"
-                className="text-danger"
-              />
-            </Form.Group>
+            <InputField field="phone" />
 
             {/* Password field */}
-            <Form.Group controlId="password" className="py-1">
-              <Form.Label>Password</Form.Label>
-              <Field
-                type="password"
-                name="password"
-                as={Form.Control}
-                style={{ backgroundColor: "#faebd8 " }}
-              />
-              <ErrorMessage
-                name="password"
-                component="div"
-                className="text-danger"
-              />
-            </Form.Group>
+            <InputField field="password" />
 
-            {/* confirmPassword field */}
-            <Form.Group controlId="confirmPassword" className="py-1">
-              <Form.Label>Confirm Password</Form.Label>
-              <Field
-                type="password"
-                name="confirmPassword"
-                as={Form.Control}
-                style={{ backgroundColor: "#faebd8 " }}
-              />
-              <ErrorMessage
-                name="confirmPassword"
-                component="div"
-                className="text-danger"
-              />
-            </Form.Group>
+            {/* Confirm password field */}
+            <InputField field="confirmPassword" />
+
+            {errorMessage && <div className="text-danger">{errorMessage}</div>}
+
+            {/* Button container */}
             <div className="btn-container d-flex justify-content-start py-3">
               <Button type="submit" disabled={!isValid || isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Sign up"}
+                {isSubmitting ? "Signing up..." : "Sign up"}
               </Button>
               <Button
                 variant="danger"
@@ -242,6 +177,8 @@ const FormComp = () => {
                 Reset
               </Button>
             </div>
+
+            {/* Login link */}
             <p className="mt-1">
               Already a User? <Link to={"/login"}>Login here</Link>
             </p>

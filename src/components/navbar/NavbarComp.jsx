@@ -4,13 +4,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { authAction } from "../../store/authSlice";
 
 export default function NavbarComp() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(location)
   const path = location.pathname;
+
+  // Default navlink in navbar
   let navLink = "/login";
   let navText = "Login";
+
+  // Conditionally changing navlinks
   if (path == "/login") {
     navLink = "/signup";
     navText = "Signup";
@@ -18,16 +21,17 @@ export default function NavbarComp() {
     navLink = "/login";
     navText = "Logout";
   }
+
   const handleNavClick = () => {
     if (navText == "Logout") {
       if (confirm("Are you sure want to logout?")) {
-        dispatch(authAction.setLoggedInUser({}))
+        dispatch(authAction.setLoggedInUser({}));
         navigate(navLink);
       }
-    }else if(navText == 'Signup'){
-      navigate(navLink)
-    }else if(navText == 'Login'){
-      navigate(navLink)
+    } else if (navText == "Signup") {
+      navigate(navLink);
+    } else if (navText == "Login") {
+      navigate(navLink);
     }
   };
   return (

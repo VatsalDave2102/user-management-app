@@ -1,6 +1,6 @@
 import { Card, Image } from "react-bootstrap";
 import { useSelector } from "react-redux";
-import './UserCard.css'
+import "./UserCard.css";
 const UserCard = () => {
   const loggedInUser = useSelector((state) => state.auth.loggedInUser);
   return (
